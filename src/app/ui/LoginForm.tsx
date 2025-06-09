@@ -65,6 +65,7 @@ export default function LoginForm() {
             </div>
             <button type="submit">Login</button>
             <Link href="/signup">Don't have an account? Sign up</Link>
+            <Link href="/forgot-password">Forgot Password?</Link>
         </form>
     );
 }
