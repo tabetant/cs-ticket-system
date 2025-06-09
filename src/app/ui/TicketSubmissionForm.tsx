@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function SignupForm() {
+export default function TicketSubmissionForm() {
     const router = useRouter();
     const pathname = usePathname();
     const inputsSchema = z.object({
