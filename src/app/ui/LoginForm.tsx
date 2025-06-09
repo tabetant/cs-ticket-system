@@ -5,8 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { db } from "@/db/index";
-import { users } from "@/db/schema";
 
 export default function LoginForm() {
     const router = useRouter();
@@ -26,46 +24,52 @@ export default function LoginForm() {
             password: '',
         }
     })
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { error } = await supabase().auth.signInWithPassword({
-            email: data.email,
-            password: data.password,
+    const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password,
         });
 
-        if (error) {
-            console.error("Error logging in:", error);
+        if (loginError) {
+            console.error("Error logging in:", loginError);
+            return;
+        }
+
+        const { data: userRow, error: userError } = await supabase
+            .from('users')
+            .select('role')
+            .eq('email', formData.email)
+            .single();
+
+        if (userError) {
+            console.error("Error fetching user:", userError);
         } else {
-            const { data: user, error: userError } = await db.select(users).where(eq(users.email, data.email)).single();
-            if (userError) {
-                console.error("Error fetching user:", userError);
+            if (userRow.role === 'admin') {
+                router.push('/admin/admindashboard');
             } else {
-                if (user.role === 'admin') {
-                    router.push('/admin/admindashboard');
-                }
-                else {
-                    router.push('/public/dashboard');
-                }
+                router.push('/public/dashboard');
             }
         }
-    }
-
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <h1>Login</h1>
+            <h1 className='text-4xl my-2 text-center'>Login</h1>
             <div>
                 <label>Email:</label>
-                <input type="email" {...register("email")} />
+                <input className='mx-2' placeholder='Enter email address' type="email" {...register("email")} />
                 {errors.email && <p>{errors.email.message}</p>}
             </div>
             <div>
                 <label>Password:</label>
-                <input type="password" {...register("password")} />
+                <input className='mx-2' placeholder='Enter password' type="password" {...register("password")} />
                 {errors.password && <p>{errors.password.message}</p>}
             </div>
-            <button type="submit">Login</button>
-            <Link href="/signup">Don't have an account? Sign up</Link>
-            <Link href="/forgot-password">Forgot Password?</Link>
+            <div className='flex flex-col items-center justify-center gap-2'>
+                <button type="submit">Login</button>
+                <Link href="/signup">Don't have an account? Sign up</Link>
+                <Link href="/forgot-password">Forgot Password?</Link>
+            </div>
         </form>
     );
 }

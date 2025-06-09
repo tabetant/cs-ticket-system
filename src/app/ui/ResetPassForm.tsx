@@ -23,11 +23,11 @@ export default function ResetPassForm() {
         }
     })
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { data: user, error: userError } = await supabase.select(users).eq(email, data.email).single();
+        const { data: user, error: userError } = supabase.select(users).eq(email, data.email).single();
         if (userError) {
             console.error("Error fetching user:", userError);
         } else {
-            await supabase.auth.resetPasswordForEmail(email, {
+            supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: 'https://localhost:3000/reset-password'
             })
             if (user) {

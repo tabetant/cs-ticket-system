@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function EmailVerificationPage() {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
                 <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
                 <p className="text-gray-700 mb-4">
@@ -12,9 +12,11 @@ export default function EmailVerificationPage() {
                     If you didn't receive the email, please check your spam folder or request a new verification email.
                 </p>
             </div>
-            <Link href="/login" className="mt-4 text-blue-500 hover:underline">
-                Go to Login
-            </Link>
+            <div className='border-blue-500 border-2 p-4 rounded-lg mt-4  hover:text-white hover:bg-blue-500 transition-colors duration-300'>
+                <Link href="/login" className=" mt-4 text-blue-500 hover:underline">
+                    Go to Login
+                </Link>
+            </div>
         </div>
     );
 }

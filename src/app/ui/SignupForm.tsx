@@ -30,7 +30,7 @@ export default function SignupForm() {
         }
     })
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { error } = await supabase().auth.signUp({
+        const { error } = await supabase.auth.signUp({
             email: data.email,
             password: data.password,
         });
@@ -54,27 +54,28 @@ export default function SignupForm() {
 
     return (
         <form>
-            <h1>Sign Up</h1>
+            <h1 className='text-4xl my-2 text-center'>Sign Up</h1>
             <div>
                 <label>Name:</label>
-                <input type="text" {...register("name")} />
+                <input className='mx-2' placeholder='Enter your name' type="text" {...register("name")} />
                 {errors.name && <p>{errors.name.message}</p>}
             </div>
             <div>
                 <label>Email:</label>
-                <input type="email" {...register("email")} />
+                <input className='mx-2' type="email" {...register("email")} placeholder='Enter email address' />
                 {errors.email && <p>{errors.email.message}</p>}
             </div>
             <div>
                 <label>Password:</label>
-                <input type="password" {...register("password")} />
+                <input className='mx-2' type="password" {...register("password")} placeholder='Enter password' />
                 {errors.password && <p>{errors.password.message}</p>}
             </div>
-
-            <button type="submit" onClick={handleSubmit(onSubmit)}>Sign Up</button>
-            <Link href="/login">Already have an account? Log in</Link>
-            <Link href="/">Back to Home</Link>
-            <Link href="/forgot-password">Forgot Password?</Link>
+            <div className='flex flex-col items-center justify-center gap-2'>
+                <button type="submit" onClick={handleSubmit(onSubmit)}>Sign Up</button>
+                <Link href="/login">Already have an account? Log in</Link>
+                <Link href="/">Back to Home</Link>
+                <Link href="/forgot-password">Forgot Password?</Link>
+            </div>
         </form>
     )
 }

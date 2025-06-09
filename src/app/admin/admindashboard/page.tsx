@@ -8,7 +8,8 @@ export default function AdminDashboardPage() {
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     useEffect(() => {
-        supabase().auth.getSession().then(({ data: { session } }) => {
+        const checkAdmin = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 setError('You must be logged in to access this page.');
             } else {
@@ -20,16 +21,18 @@ export default function AdminDashboardPage() {
                 }
                 else {
                     setEmail(user.email);
+                    router.push('/admin/admindashboard');
                 }
             }
             setLoading(false);
-        })
+        }
+        checkAdmin();
     }, [])
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">User Dashboard</h1>
+                <h1 className="text-2xl font-bold mb-6 text-center">Admin Dashboard</h1>
                 <p className="text-center">Welcome to your dashboard!</p>
             </div>
         </div>

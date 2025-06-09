@@ -9,17 +9,28 @@ export default function UserDashboardPage() {
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     useEffect(() => {
-        supabase().auth.getSession().then(({ data: { session } }) => {
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 setError('You must be logged in to access this page.');
                 router.push('/login');
             } else {
-                const userEmail = await supabase.auth.user().email;
-                setEmail(userEmail);
+                const {
+                    data: { user },
+                    error: userError,
+                } = await supabase.auth.getUser();
+
+                if (userError || !user) {
+                    setError('Could not fetch user data.');
+                    router.push('/login');
+                } else {
+                    setEmail(user.email ?? '');
+                }
             }
             setLoading(false);
-        })
-    }, [])
+        };
+        checkUser();
+    }, []);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
