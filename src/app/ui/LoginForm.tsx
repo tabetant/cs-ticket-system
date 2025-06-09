@@ -67,8 +67,8 @@ export default function LoginForm() {
             </div>
             <div className='flex flex-col items-center justify-center gap-2'>
                 <button type="submit">Login</button>
-                <Link href="/signup">Don't have an account? Sign up</Link>
-                <Link href="/forgot-password">Forgot Password?</Link>
+                <Link href="/public/signup">Don't have an account? Sign up</Link>
+                <Link href="/request-reset">Forgot Password?</Link>
             </div>
         </form>
     );

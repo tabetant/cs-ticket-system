@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 
-export default function ResetPassForm() {
+export default function RequestResetForm() {
     const router = useRouter();
     const inputsSchema = z.object({
         email: z.string().email('Invalid email address'),
@@ -23,33 +23,30 @@ export default function ResetPassForm() {
         }
     })
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { data: user, error: userError } = supabase.select(users).eq(email, data.email).single();
+        const { data: user, error: userError } = await supabase.from('users').select('*').eq('email', data.email).single();
         if (userError) {
             console.error("Error fetching user:", userError);
         } else {
-            supabase.auth.resetPasswordForEmail(email, {
+            supabase.auth.resetPasswordForEmail(data.email, {
                 redirectTo: 'https://localhost:3000/reset-password'
             })
             if (user) {
                 console.log("Password reset email sent to:", data.email);
-                router.push('/forgot-pass-email');
+                router.push('/check-email');
             } else {
                 console.error("User not found with email:", data.email);
             }
         }
     }
-}
 
-
-return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-        <h1>Enter Email</h1>
-        <div>
-            <label>Email:</label>
-            <input type="email" {...register("email")} />
-            {errors.email && <p>{errors.email.message}</p>}
-        </div>
-        <button type="submit">Reset Password</button>
-    </form>
-);
+    return (
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <div>
+                <label>Email:</label>
+                <input className='mx-2' type="email" {...register("email")} placeholder='Enter email address' />
+                {errors.email && <p>{errors.email.message}</p>}
+            </div>
+            <button type="submit">Reset Password</button>
+        </form>
+    );
 }
