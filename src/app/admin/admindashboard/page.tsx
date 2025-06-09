@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/db/client';
 import { useRouter } from 'next/navigation';
-
-export default function UserDashboardPage() {
+export default function AdminDashboardPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -12,10 +11,16 @@ export default function UserDashboardPage() {
         supabase().auth.getSession().then(({ data: { session } }) => {
             if (!session) {
                 setError('You must be logged in to access this page.');
-                router.push('/login');
             } else {
-                const userEmail = await supabase.auth.user().email;
-                setEmail(userEmail);
+                const user = await supabase.auth.getUser();
+                const role = await supabase.from('users').select('role').eq('id', user.id);
+                if (role !== 'admin') {
+                    setError('You do not have permission to access this page.');
+                    router.push('/public/dashboard');
+                }
+                else {
+                    setEmail(user.email);
+                }
             }
             setLoading(false);
         })
