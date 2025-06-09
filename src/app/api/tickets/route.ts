@@ -1,6 +1,7 @@
 import { db } from "@/db/index";
 import { tickets } from "@/db/drizzle/schema";
 import { NextResponse } from "next/server";
+
 export async function GET(request: Request) {
     const allTickets = await db.select().from(tickets);
     if (allTickets.length === 0) {
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
         status: 200,
     });
 }
-
+x
 export async function POST(request: Request) {
     const body = await request.json();
     if (!body || !body.title || !body.description) {
