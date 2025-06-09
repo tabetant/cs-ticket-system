@@ -1,4 +1,3 @@
-CREATE TYPE "public"."status" AS ENUM('open', 'closed', 'in_progress', 'resolved');--> statement-breakpoint
 CREATE TABLE "tickets" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"title" text NOT NULL,

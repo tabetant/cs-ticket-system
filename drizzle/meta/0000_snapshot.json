@@ -1,5 +1,5 @@
 {
-  "id": "5307d452-a647-42ae-b228-c71ccaf7da4c",
+  "id": "ae0aa94a-fd95-4b30-bece-5c351b9d4825",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -65,6 +65,16 @@
       "values": [
         "admin",
         "user"
+      ]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": [
+        "open",
+        "closed",
+        "in_progress",
+        "resolved"
       ]
     }
   },

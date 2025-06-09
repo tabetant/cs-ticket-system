@@ -2,6 +2,7 @@ import { serial, text, pgTable, pgEnum, date, integer } from 'drizzle-orm/pg-cor
 
 export const roleEnum = pgEnum('role', ['admin', 'user']);
 export const statusEnum = pgEnum('status', ['open', 'closed', 'in_progress', 'resolved']);
+
 export const users = pgTable('users', {
     id: serial('id').primaryKey(),
     email: text('email').notNull().unique(),
@@ -26,9 +27,6 @@ export const messages = pgTable('messages', {
     id: serial('id').primaryKey(),
     message_text: text('message_text').notNull(),
     createdAt: date('created_at').notNull().defaultNow(),
-    ticketId: integer('ticket_id')
-        .notNull()
-        .references(() => tickets.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
     userId: integer('user_id')
         .notNull()
         .references(() => users.id, { onDelete: 'cascade', onUpdate: 'cascade' }),

@@ -1,4 +1,5 @@
 CREATE TYPE "public"."role" AS ENUM('admin', 'user');--> statement-breakpoint
+CREATE TYPE "public"."status" AS ENUM('open', 'closed', 'in_progress', 'resolved');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
