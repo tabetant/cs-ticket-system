@@ -1,5 +1,4 @@
 import { serial, text, pgTable, pgEnum, date, integer } from 'drizzle-orm/pg-core';
-import { title } from 'process';
 
 export const roleEnum = pgEnum('role', ['admin', 'user']);
 export const statusEnum = pgEnum('status', ['open', 'closed', 'in_progress', 'resolved']);
@@ -23,3 +22,14 @@ export const tickets = pgTable('tickets', {
         .references(() => users.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
 });
 
+export const messages = pgTable('messages', {
+    id: serial('id').primaryKey(),
+    message_text: text('message_text').notNull(),
+    createdAt: date('created_at').notNull().defaultNow(),
+    ticketId: integer('ticket_id')
+        .notNull()
+        .references(() => tickets.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+    userId: integer('user_id')
+        .notNull()
+        .references(() => users.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+});
