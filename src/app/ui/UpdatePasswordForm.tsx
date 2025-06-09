@@ -22,7 +22,7 @@ export default function UpdatePasswordForm() {
         }
     })
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { error } = await supabase().auth.updateUser({ password: data.password })
+        const { error } = await supabase.auth.updateUser({ password: data.password })
         if (error) {
             console.error("Error updating password:", error);
         } else {
@@ -34,10 +34,9 @@ export default function UpdatePasswordForm() {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <h1>Enter new password</h1>
             <div>
-                <label>Password:</label>
-                <input type="password" {...register("password")} />
+                <label>New Password:</label>
+                <input className='mx-2' placeholder='Enter new password' type="password" {...register("password")} />
                 {errors.password && <p>{errors.password.message}</p>}
             </div>
             <button type="submit">Reset Password</button>

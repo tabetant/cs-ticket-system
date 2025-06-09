@@ -28,7 +28,7 @@ export default function RequestResetForm() {
             console.error("Error fetching user:", userError);
         } else {
             supabase.auth.resetPasswordForEmail(data.email, {
-                redirectTo: 'https://localhost:3000/reset-password'
+                redirectTo: 'http://localhost:3000/update-password'
             })
             if (user) {
                 console.log("Password reset email sent to:", data.email);
