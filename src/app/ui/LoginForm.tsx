@@ -8,7 +8,6 @@ import Link from "next/link";
 
 export default function LoginForm() {
     const router = useRouter();
-    const pathname = usePathname();
     const inputsSchema = z.object({
         email: z.string().email('Invalid email address'),
         password: z.string().min(6, "Password must be at least 6 characters long"),
