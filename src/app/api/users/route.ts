@@ -1,8 +1,15 @@
 import { db } from "@/db/index";
 import { users } from "@/db/drizzle/schema";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-    return new Response("Hello, this is the users API route!");
+    const allUsers = await db.select().from(users);
+    if (allUsers.length === 0) {
+        return new Response("No users found", { status: 404 });
+    }
+    return NextResponse.json(allUsers, {
+        status: 200,
+    });
 }
 
 export async function POST(request: Request) {
@@ -15,14 +22,14 @@ export async function POST(request: Request) {
         name: body.name,
         role: body.role || 'user', // Default to 'user' if role is not provided
     });
-    return new Response("User successfully created!", {
+    return NextResponse("User successfully created!", {
         status: 201
     });
 }
 
 export async function DELETE(request: Request) {
-    return new Response("This is a DELETE request to the users API route!");
+    return NextResponse("This is a DELETE request to the users API route!");
 }
 export async function PATCH(request: Request) {
-    return new Response("This is a PATCH request to the users API route!");
+    return NextResponse("This is a PATCH request to the users API route!");
 }
