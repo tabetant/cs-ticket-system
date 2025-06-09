@@ -4,6 +4,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { db } from "@/db/index";
+import { users } from "@/db/schema";
 
 export default function TicketSubmissionForm() {
     const router = useRouter();
@@ -27,7 +29,13 @@ export default function TicketSubmissionForm() {
     })
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-
+        const { title, description } = data;
+        const { error } = await db.insert(users).values(
+            {
+                title,
+                description,
+            }
+        )
     }
 
     return (

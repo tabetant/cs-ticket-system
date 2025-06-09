@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { db } from "@/db/index";
+import { users } from "@/db/schema";
 
 export default function SignupForm() {
     const router = useRouter();
@@ -35,12 +37,11 @@ export default function SignupForm() {
         if (error) {
             console.error("Error signing up:", error);
         } else {
-            await supabase().from('users').insert({
+            await db.insert(users).values({
                 email: data.email,
                 name: data.name,
                 created_at: new Date(),
                 role: pathname == '/admin-signup' ? 'admin' : 'user'
-
             });
             router.push('/email-ver');
         }
