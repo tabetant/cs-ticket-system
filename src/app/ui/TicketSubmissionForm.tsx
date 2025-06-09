@@ -29,13 +29,16 @@ export default function TicketSubmissionForm() {
     })
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { title, description } = data;
-        const { error } = await db.insert(users).values(
-            {
-                title,
-                description,
-            }
-        )
+        await fetch('/api/tickets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: data.title,
+                description: data.description,
+            }),
+        });
     }
 
     return (
@@ -53,6 +56,6 @@ export default function TicketSubmissionForm() {
             </div>
 
             <button type="submit" onClick={handleSubmit(onSubmit)}>Add Ticket</button>
-        </form>
+        </form >
     )
 }
