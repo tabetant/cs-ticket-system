@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { db } from "@/db/index";
-import { users } from "@/db/schema";
+import { users } from "@/db/drizzle/schema";
 
 export default function SignupForm() {
     const router = useRouter();
