@@ -5,8 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { db } from "@/db/index";
-import { users } from "@/db/schema";
 
 export default function ResetPassForm() {
     const router = useRouter();
@@ -25,7 +23,7 @@ export default function ResetPassForm() {
         }
     })
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        const { data: user, error: userError } = await db.select(users).where(eq(users.email, data.email)).single();
+        const { data: user, error: userError } = await supabase.select(users).eq(email, data.email).single();
         if (userError) {
             console.error("Error fetching user:", userError);
         } else {

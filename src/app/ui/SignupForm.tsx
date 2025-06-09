@@ -37,11 +37,16 @@ export default function SignupForm() {
         if (error) {
             console.error("Error signing up:", error);
         } else {
-            await db.insert(users).values({
-                email: data.email,
-                name: data.name,
-                created_at: new Date(),
-                role: pathname == '/admin-signup' ? 'admin' : 'user'
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: data.email,
+                    name: data.name,
+                    role: 'user',
+                }),
             });
             router.push('/email-ver');
         }
