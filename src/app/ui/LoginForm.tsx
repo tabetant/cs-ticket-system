@@ -44,11 +44,7 @@ export default function LoginForm() {
         if (userError) {
             console.error("Error fetching user:", userError);
         } else {
-            if (userRow.role === 'admin') {
-                router.push('/admin/admindashboard');
-            } else {
-                router.push('/public/dashboard');
-            }
+            router.push('/support')
         }
     };
 
@@ -67,7 +63,6 @@ export default function LoginForm() {
             </div>
             <div className='flex flex-col items-center justify-center gap-2'>
                 <button type="submit">Login</button>
-                <Link href="/public/signup">Don't have an account? Sign up</Link>
                 <Link href="/request-reset">Forgot Password?</Link>
             </div>
         </form>

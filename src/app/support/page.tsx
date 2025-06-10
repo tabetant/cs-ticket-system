@@ -8,25 +8,17 @@ export default function SupportPage() {
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     useEffect(() => {
-        const checkAdmin = async () => {
+        const checkLoggedin = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 setError('You must be logged in to access this page.');
             } else {
-                const user = await supabase.auth.getUser();
-                const role = await supabase.from('users').select('role').eq('id', user.id);
-                if (role !== 'admin') {
-                    setError('You do not have permission to access this page.');
-                    router.push('/public/dashboard');
-                }
-                else {
-                    setEmail(user.email);
-                    router.push('/admin/admindashboard');
-                }
+                const userResponse = await supabase.auth.getUser();
+                setEmail(userResponse.data.user?.email || '');
             }
             setLoading(false);
         }
-        checkAdmin();
+        checkLoggedin();
     }, [])
 
     return (

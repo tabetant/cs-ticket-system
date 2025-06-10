@@ -32,7 +32,6 @@ export default function TicketSubmissionForm() {
             phone: "",
             email: "",
             tenant: "",
-            status: "open",
             title: "",
             description: "",
         }
