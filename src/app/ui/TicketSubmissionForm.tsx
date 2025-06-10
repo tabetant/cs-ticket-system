@@ -1,5 +1,4 @@
 'use client'
-import { supabase } from "@/db/client";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
@@ -32,6 +31,7 @@ export default function TicketSubmissionForm() {
             phone: "",
             email: "",
             tenant: "",
+
             title: "",
             description: "",
         }
