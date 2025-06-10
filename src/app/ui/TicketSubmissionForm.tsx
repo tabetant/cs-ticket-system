@@ -4,15 +4,19 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { db } from "@/db/index";
-import { users } from "@/db/schema";
+
 
 export default function TicketSubmissionForm() {
     const router = useRouter();
     const pathname = usePathname();
     const inputsSchema = z.object({
+        firstName: z.string().min(1, "First name is required"),
+        lastName: z.string().min(1, "Last name is required"),
+        phone: z.string().min(1, "Phone number is required"),
+        email: z.string().email("Invalid email address").min(1, "Email is required"),
         title: z.string().min(1, "Title is required"),
         description: z.string().min(1, "Description is required"),
+        tenant: z.string().min(1, "Tenant is required"),
     })
     type Inputs = z.infer<typeof inputsSchema>;
     const {
@@ -23,6 +27,12 @@ export default function TicketSubmissionForm() {
     } = useForm<Inputs>({
         resolver: zodResolver(inputsSchema),
         defaultValues: {
+            firstName: "",
+            lastName: "",
+            phone: "",
+            email: "",
+            tenant: "",
+            status: "open",
             title: "",
             description: "",
         }
@@ -54,7 +64,31 @@ export default function TicketSubmissionForm() {
                 <input type="text" {...register("description")} />
                 {errors.description && <p>{errors.description.message}</p>}
             </div>
-
+            <div>
+                <label>First Name:</label>
+                <input type="text" {...register("firstName")} />
+                {errors.firstName && <p>{errors.firstName.message}</p>}
+            </div>
+            <div>
+                <label>Last Name:</label>
+                <input type="text" {...register("lastName")} />
+                {errors.lastName && <p>{errors.lastName.message}</p>}
+            </div>
+            <div>
+                <label>Phone:</label>
+                <input type="text" {...register("phone")} />
+                {errors.phone && <p>{errors.phone.message}</p>}
+            </div>
+            <div>
+                <label>Email:</label>
+                <input type="email" {...register("email")} />
+                {errors.email && <p>{errors.email.message}</p>}
+            </div>
+            <div>
+                <label>Tenant:</label>
+                <input type="text" {...register("tenant")} />
+                {errors.tenant && <p>{errors.tenant.message}</p>}
+            </div>
             <button type="submit" onClick={handleSubmit(onSubmit)}>Add Ticket</button>
         </form >
     )
