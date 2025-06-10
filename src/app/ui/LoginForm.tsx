@@ -34,20 +34,10 @@ export default function LoginForm() {
             console.error("Error logging in:", loginError);
             return;
         }
-
-        const { data: userRow, error: userError } = await supabase
-            .from('users')
-            .select('role')
-            .eq('email', formData.email)
-            .single();
-
-        if (userError) {
-            console.error("Error fetching user:", userError);
-        } else {
+        else {
             router.push('/support')
-        }
-    };
-
+        };
+    }
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <h1 className='text-4xl my-2 text-center'>Login</h1>

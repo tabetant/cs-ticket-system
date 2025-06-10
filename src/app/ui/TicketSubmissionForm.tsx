@@ -1,13 +1,9 @@
 'use client'
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useRouter, usePathname } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-
 export default function TicketSubmissionForm() {
-    const router = useRouter();
-    const pathname = usePathname();
     const inputsSchema = z.object({
         firstName: z.string().min(1, "First name is required"),
         lastName: z.string().min(1, "Last name is required"),

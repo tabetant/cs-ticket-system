@@ -2,7 +2,7 @@ import { serial, text, pgTable, date, pgEnum, integer } from 'drizzle-orm/pg-cor
 
 export const statusEnum = pgEnum('status', ['open', 'closed', 'in_progress', 'resolved']);
 
-export const support = pgTable('users', {
+export const support = pgTable('support', {
     id: serial('id').primaryKey(),
     email: text('email').notNull().unique(),
     firstName: text('first_name').notNull(),

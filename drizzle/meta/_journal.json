@@ -15,6 +15,13 @@
       "when": 1749571941100,
       "tag": "0001_whole_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1749574481374,
+      "tag": "0002_flaky_flatman",
+      "breakpoints": true
     }
   ]
 }
