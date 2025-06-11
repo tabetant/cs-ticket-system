@@ -1,4 +1,4 @@
-import { serial, text, pgTable, date, pgEnum, integer } from 'drizzle-orm/pg-core';
+import { serial, text, pgTable, timestamp, pgEnum, integer } from 'drizzle-orm/pg-core';
 
 export const statusEnum = pgEnum('status', ['open', 'closed', 'in_progress', 'resolved']);
 
@@ -7,7 +7,7 @@ export const support = pgTable('support', {
     email: text('email').notNull().unique(),
     firstName: text('first_name').notNull(),
     lastName: text('last_name').notNull(),
-    createdAt: date('created_at').notNull().defaultNow(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const tickets = pgTable('tickets', {
@@ -16,12 +16,12 @@ export const tickets = pgTable('tickets', {
     description: text('description').notNull(),
     firstName: text('first_name').notNull(),
     lastName: text('last_name').notNull(),
-    email: text('email').notNull().unique(),
+    email: text('email').notNull(),
     phone: text('phone').notNull(),
-    createdAt: date('created_at').notNull().defaultNow(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     tenant: text('tenant').notNull(),
     attachment_url: text('attachment_url').notNull().default(''),
     status: statusEnum('status').notNull().default('open'),
-    updatedAt: date('updated_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 

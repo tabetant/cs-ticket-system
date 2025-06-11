@@ -11,13 +11,21 @@ export async function GET(request: Request) {
         status: 200,
     });
 }
-x
+
 export async function POST(request: Request) {
     const body = await request.json();
-    if (!body || !body.title || !body.description) {
-        return new NextResponse("Invalid request body", { status: 400 });
+    if (!body.title || !body.description || !body.firstName || !body.email || !body.phone || !body.tenant) {
+        return new NextResponse("Missing required fields", { status: 400 });
     }
-
+    if (typeof body.title !== 'string' || typeof body.description !== 'string' ||
+        typeof body.firstName !== 'string' || typeof body.lastName !== 'string' ||
+        typeof body.email !== 'string' || typeof body.phone !== 'string' ||
+        typeof body.tenant !== 'string' || typeof body.status !== 'string') {
+        return new NextResponse("Invalid data types", { status: 400 });
+    }
+    if (body.status && !['open', 'closed', 'in_progress', 'resolved'].includes(body.status)) {
+        return new NextResponse("Invalid status value", { status: 400 });
+    }
     try {
         await db.insert(tickets).values({
             title: body.title,
@@ -37,6 +45,8 @@ export async function POST(request: Request) {
             status: 201,
         });
     } catch (error: any) {
+        console.error("Ticket insert failed:", error);
+
         return new Response("Error creating ticket: " + (error?.message || error), { status: 500 });
     }
 }

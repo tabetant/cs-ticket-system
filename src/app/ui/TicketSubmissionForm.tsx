@@ -2,6 +2,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Ticket } from "../support/page";
 
 export default function TicketSubmissionForm() {
     const inputsSchema = z.object({
@@ -22,14 +23,13 @@ export default function TicketSubmissionForm() {
     } = useForm<Inputs>({
         resolver: zodResolver(inputsSchema),
         defaultValues: {
+            title: "",
+            description: "",
             firstName: "",
             lastName: "",
             phone: "",
             email: "",
             tenant: "",
-
-            title: "",
-            description: "",
         }
     })
 
@@ -42,6 +42,12 @@ export default function TicketSubmissionForm() {
             body: JSON.stringify({
                 title: data.title,
                 description: data.description,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                phone: data.phone,
+                email: data.email,
+                tenant: data.tenant,
+                status: 'open' as Ticket['status'],
             }),
         });
     }
