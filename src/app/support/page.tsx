@@ -4,6 +4,8 @@ import { supabase } from '@/db/client';
 import { useRouter } from 'next/navigation';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
+import Draggable from 'react-draggable';
+import { useRef, useMemo, createRef } from 'react';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,6 +38,13 @@ export default function SupportPage() {
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
     const [tickets, setTickets] = useState<Ticket[]>([]);
+    const nodeRefs = useMemo(() => {
+        const refs: { [key: number]: React.RefObject<HTMLDivElement> } = {};
+        tickets.forEach(ticket => {
+            refs[ticket.id] = createRef<HTMLDivElement>();
+        });
+        return refs;
+    }, [tickets]);
 
     const fetchTickets = async () => {
         try {
@@ -77,30 +86,50 @@ export default function SupportPage() {
 
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded shadow-md w-full max-w-full">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {tickets.map((ticket) => (
-                        <Card key={ticket.id}>
-                            <h2 className="text-lg font-semibold">{ticket.title}</h2>
-                            <p className="text-sm text-gray-600 mt-2">{ticket.description}</p>
+        <div className="min-h-screen w-full bg-gray-100 p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {tickets.map((ticket) => {
+                    if (!nodeRefs[ticket.id]) {
+                        nodeRefs[ticket.id] = useRef(null);
+                    }
 
-                            <div className="mt-4 space-y-1 text-sm text-gray-700">
-                                <p>
-                                    <span className="font-medium">Status: </span>
-                                    <Badge color={getStatusColor(ticket.status)}>{ticket.status}</Badge>
-                                </p>
-                                <p><span className="font-medium">Submitted:</span> {new Date(ticket.createdAt).toLocaleDateString()}</p>
-                                <p><span className="font-medium">Tenant:</span> {ticket.tenant}</p>
-                                <p>
-                                    <span className="font-medium">Customer:</span> {ticket.firstName} {ticket.lastName} — {ticket.email} - {ticket.phone}
-                                </p>
+                    return (
+                        <Draggable
+                            key={ticket.id}
+                            nodeRef={nodeRefs[ticket.id]}
+                            handle=".handle"
+                        >
+                            <div ref={nodeRefs[ticket.id]}>
+                                <Card>
+                                    <div className="handle cursor-move">
+                                        <h2 className="text-lg font-semibold">{ticket.title}</h2>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-2">{ticket.description}</p>
+
+                                    <div className="mt-4 space-y-1 text-sm text-gray-700">
+                                        <p>
+                                            <span className="font-medium">Status: </span>
+                                            <Badge color={getStatusColor(ticket.status)}>{ticket.status}</Badge>
+                                        </p>
+                                        <p>
+                                            <span className="font-medium">Submitted:</span>{" "}
+                                            {new Date(ticket.createdAt).toLocaleDateString()}
+                                        </p>
+                                        <p>
+                                            <span className="font-medium">Tenant:</span> {ticket.tenant}
+                                        </p>
+                                        <p>
+                                            <span className="font-medium">Customer:</span> {ticket.firstName} {ticket.lastName}
+                                            <br />
+                                            {ticket.email} — {ticket.phone}
+                                        </p>
+                                    </div>
+                                </Card>
                             </div>
-                        </Card>
-                    ))}
-                </div>
-
-            </div >
-        </div >
+                        </Draggable>
+                    );
+                })}
+            </div>
+        </div>
     );
 }
