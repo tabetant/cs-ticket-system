@@ -2,6 +2,18 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/db/client';
 import { useRouter } from 'next/navigation';
+import { Card } from '../ui/Card';
+import { Badge } from '../ui/Badge';
+
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case "open": return "red";
+        case "in_progress": return "yellow";
+        case "resolved": return "emerald";
+        case "closed": return "gray";
+        default: return "gray";
+    }
+}
 
 export type Ticket = {
     id: number;
@@ -63,12 +75,32 @@ export default function SupportPage() {
         setLoading(false);
     }, [])
 
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-                <h1 className="text-2xl font-bold mb-6 text-center">Admin Dashboard</h1>
-                <p className="text-center">Welcome to your dashboard!</p>
-            </div>
-        </div>
+            <div className="bg-white p-8 rounded shadow-md w-full max-w-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {tickets.map((ticket) => (
+                        <Card key={ticket.id}>
+                            <h2 className="text-lg font-semibold">{ticket.title}</h2>
+                            <p className="text-sm text-gray-600 mt-2">{ticket.description}</p>
+
+                            <div className="mt-4 space-y-1 text-sm text-gray-700">
+                                <p>
+                                    <span className="font-medium">Status: </span>
+                                    <Badge color={getStatusColor(ticket.status)}>{ticket.status}</Badge>
+                                </p>
+                                <p><span className="font-medium">Submitted:</span> {new Date(ticket.createdAt).toLocaleDateString()}</p>
+                                <p><span className="font-medium">Tenant:</span> {ticket.tenant}</p>
+                                <p>
+                                    <span className="font-medium">Customer:</span> {ticket.firstName} {ticket.lastName} — {ticket.email} - {ticket.phone}
+                                </p>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+
+            </div >
+        </div >
     );
 }
