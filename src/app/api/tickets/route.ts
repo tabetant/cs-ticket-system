@@ -1,7 +1,7 @@
 import { db } from "@/db/index";
 import { tickets } from "@/db/drizzle/schema";
 import { NextResponse } from "next/server";
-
+import { eq } from "drizzle-orm";
 export async function GET(request: Request) {
     const allTickets = await db.select().from(tickets);
     if (allTickets.length === 0) {
@@ -48,5 +48,23 @@ export async function POST(request: Request) {
         console.error("Ticket insert failed:", error);
 
         return new Response("Error creating ticket: " + (error?.message || error), { status: 500 });
+    }
+}
+
+export async function PATCH(request: Request) {
+    const body = await request.json();
+    if (!body.id || !body.status) {
+        return new NextResponse("Missing required fields", { status: 400 });
+    }
+    const id = body.id;
+    const status = body.status;
+    try {
+        await db.update(tickets).set({ status: status }).where(eq(tickets.id, id));
+        return new Response('Ticket updated successfully', {
+            status: 200,
+        });
+    } catch (error: any) {
+        console.error("Ticket update failed:", error);
+        return new Response("Error updating ticket: " + (error?.message || error), { status: 500 });
     }
 }
