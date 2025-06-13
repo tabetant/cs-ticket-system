@@ -1,12 +1,16 @@
-'use client' // adjust path if needed
-import Link from "next/link";
+'use client'
 import { TicketFilterProvider } from '../ui/TicketFilterContext';
 import SideBar from "../ui/SideBar";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <TicketFilterProvider>
-            <SideBar />
-            <main className="flex-1 overflow-auto p-6">{children}</main>
-        </TicketFilterProvider >
+            <div className="flex min-h-screen bg-gray-100"> {/* ← flex container */}
+                <SideBar />
+                <main className="flex-1 p-4 bg-gray-50">
+                    {children}
+                </main>
+            </div>
+        </TicketFilterProvider>
     );
 }
