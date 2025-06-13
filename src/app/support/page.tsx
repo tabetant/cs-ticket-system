@@ -6,6 +6,7 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import Draggable from 'react-draggable';
 import { useRef, useMemo, createRef } from 'react';
+import { useTicketFilter } from '../ui/TicketFilterContext';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -33,6 +34,7 @@ export type Ticket = {
 }
 
 export default function SupportPage() {
+    const { filter } = useTicketFilter();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -84,11 +86,14 @@ export default function SupportPage() {
         setLoading(false);
     }, [])
 
+    const filteredTickets = filter === 'all'
+        ? tickets
+        : tickets.filter(ticket => ticket.status === filter);
 
     return (
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {tickets.map((ticket) => {
+                {filteredTickets.map((ticket) => {
                     if (!nodeRefs[ticket.id]) {
                         nodeRefs[ticket.id] = useRef(null);
                     }
