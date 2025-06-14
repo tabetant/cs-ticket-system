@@ -4,6 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ticket } from "../support/page";
 
+
 export default function TicketSubmissionForm() {
     const inputsSchema = z.object({
         firstName: z.string().min(1, "First name is required"),
@@ -20,6 +21,7 @@ export default function TicketSubmissionForm() {
         watch,
         handleSubmit,
         formState: { errors },
+        reset,
     } = useForm<Inputs>({
         resolver: zodResolver(inputsSchema),
         defaultValues: {
@@ -50,47 +52,97 @@ export default function TicketSubmissionForm() {
                 status: 'open' as Ticket['status'],
             }),
         });
+        reset();
     }
 
     return (
-        <form>
-            <h1>New Ticket</h1>
-            <div>
-                <label>Title:</label>
-                <input type="text" {...register("title")} />
-                {errors.title && <p>{errors.title.message}</p>}
+        <form className="max-w-xl mx-auto bg-white shadow-md rounded-lg p-8 space-y-6">
+            <h1 className="text-3xl font-bold text-center text-blue-600">Submit a New Ticket</h1>
+
+            <div className="space-y-2">
+                <label className="block font-semibold">Title:</label>
+                <input
+                    type="text"
+                    placeholder="Enter ticket title"
+                    {...register("title")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
             </div>
-            <div>
-                <label>Description:</label>
-                <input type="text" {...register("description")} />
-                {errors.description && <p>{errors.description.message}</p>}
+
+            <div className="space-y-2">
+                <label className="block font-semibold">Description:</label>
+                <input
+                    type="text"
+                    placeholder="Describe your issue"
+                    {...register("description")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
             </div>
-            <div>
-                <label>First Name:</label>
-                <input type="text" {...register("firstName")} />
-                {errors.firstName && <p>{errors.firstName.message}</p>}
+
+            <div className="space-y-2">
+                <label className="block font-semibold">First Name:</label>
+                <input
+                    type="text"
+                    placeholder="Your first name"
+                    {...register("firstName")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
             </div>
-            <div>
-                <label>Last Name:</label>
-                <input type="text" {...register("lastName")} />
-                {errors.lastName && <p>{errors.lastName.message}</p>}
+
+            <div className="space-y-2">
+                <label className="block font-semibold">Last Name:</label>
+                <input
+                    type="text"
+                    placeholder="Your last name"
+                    {...register("lastName")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
             </div>
-            <div>
-                <label>Phone:</label>
-                <input type="text" {...register("phone")} />
-                {errors.phone && <p>{errors.phone.message}</p>}
+
+            <div className="space-y-2">
+                <label className="block font-semibold">Phone:</label>
+                <input
+                    type="text"
+                    placeholder="Your phone number"
+                    {...register("phone")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
             </div>
-            <div>
-                <label>Email:</label>
-                <input type="email" {...register("email")} />
-                {errors.email && <p>{errors.email.message}</p>}
+
+            <div className="space-y-2">
+                <label className="block font-semibold">Email:</label>
+                <input
+                    type="email"
+                    placeholder="you@example.com"
+                    {...register("email")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </div>
-            <div>
-                <label>Tenant:</label>
-                <input type="text" {...register("tenant")} />
-                {errors.tenant && <p>{errors.tenant.message}</p>}
+
+            <div className="space-y-2">
+                <label className="block font-semibold">Tenant:</label>
+                <input
+                    type="text"
+                    placeholder="Tenant name"
+                    {...register("tenant")}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                {errors.tenant && <p className="text-red-500 text-sm">{errors.tenant.message}</p>}
             </div>
-            <button type="submit" onClick={handleSubmit(onSubmit)}>Add Ticket</button>
-        </form >
+
+            <button
+                type="submit"
+                onClick={handleSubmit(onSubmit)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
+            >
+                Add Ticket
+            </button>
+        </form>
     )
 }

@@ -10,7 +10,12 @@ export default function SideBar() {
             <h1 className="text-xl font-bold mb-6">Support Panel</h1>
             <TabNavigation className="flex-col space-y-2">
                 <TabNavigationLink asChild>
-                    <button onClick={() => setFilter('all')}>📋 All Tickets</button>
+                    <button
+                        onClick={() => setFilter('all')}
+
+                    >
+                        📋 All Tickets
+                    </button>
                 </TabNavigationLink>
                 <TabNavigationLink asChild>
                     <button onClick={() => setFilter('open')}>🟢 Open</button>

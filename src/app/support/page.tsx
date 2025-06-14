@@ -65,11 +65,14 @@ export default function SupportPage() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ id: ticketId, status: newStatus }),
-            }).then(response => {
+            }).then(async response => {
                 if (!response.ok) {
                     throw new Error(`Error updating ticket status: ${response.statusText}`);
                 }
-                return response.json();
+                // ✅ Re-fetch updated tickets after status change
+                const updatedResponse = await fetch('/api/tickets');
+                const updatedTickets = await updatedResponse.json();
+                setTickets(updatedTickets);
             });
             ;
         } catch (error) {
@@ -84,6 +87,7 @@ export default function SupportPage() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 setError('You must be logged in to access this page.');
+                router.push('/login');
             } else {
                 const userResponse = await supabase.auth.getUser();
                 setEmail(userResponse.data.user?.email || '');
@@ -125,59 +129,72 @@ export default function SupportPage() {
                             handle=".handle"
                         >
                             <div ref={nodeRefs[ticket.id]}>
-                                <Card>
-                                    <div className="handle cursor-move">
-                                        <h2 className="text-lg font-semibold">{ticket.title}</h2>
+                                <Card className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-all duration-300">
+                                    <div className="handle cursor-move mb-4">
+                                        <h2 className="text-xl font-bold text-blue-700">{ticket.title}</h2>
                                     </div>
-                                    <p className="text-sm text-gray-600 mt-2">{ticket.description}</p>
-                                    <div className="mt-4 space-y-1 text-sm text-gray-700">
+
+                                    <p className="text-gray-600 mb-4 italic">{ticket.description}</p>
+
+                                    <div className="space-y-2 text-sm text-gray-700">
                                         <p>
-                                            <span className="font-medium">Status: </span>
-                                            <Badge color={getStatusColor(ticket.status)}>{ticket.status}</Badge>
+                                            <span className="font-semibold text-gray-800">Status:</span>
+                                            <Badge color={getStatusColor(ticket.status)} className="ml-2">{ticket.status}</Badge>
                                         </p>
                                         <p>
-                                            <span className="font-medium">Submitted:</span>{" "}
-                                            {new Date(ticket.createdAt).toLocaleDateString()}
+                                            <span className="font-semibold text-gray-800">Submitted:</span>
+                                            <span className="ml-1">{new Date(ticket.createdAt).toLocaleDateString()}</span>
                                         </p>
                                         <p>
-                                            <span className="font-medium">Tenant:</span> {ticket.tenant}
+                                            <span className="font-semibold text-gray-800">Tenant:</span>
+                                            <span className="ml-1">{ticket.tenant}</span>
                                         </p>
                                         <p>
-                                            <span className="font-medium">Customer:</span> {ticket.firstName} {ticket.lastName}
-                                            <br />
-                                            {ticket.email} — {ticket.phone}
+                                            <span className="font-semibold text-gray-800">Customer:</span>
+                                            <span className="ml-1">{ticket.firstName} {ticket.lastName}</span><br />
+                                            <span className="ml-6 text-gray-500">{ticket.email} — {ticket.phone}</span>
                                         </p>
+                                    </div>
+
+                                    <div className="mt-4">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <button>Edit Status</button>
+                                                <button className="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700 transition">Edit Status</button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent>
+                                            <DropdownMenuContent className="w-48">
                                                 <DropdownMenuLabel>Status</DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuGroup>
-                                                    <DropdownMenuItem onSelect={() => { updateStatus(ticket.id, 'open') }} shortcut="⌘o">Open</DropdownMenuItem>
+                                                    <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                        onSelect={() => { updateStatus(ticket.id, 'open') }} shortcut="⌘o">Open</DropdownMenuItem>
                                                 </DropdownMenuGroup>
-
                                                 <DropdownMenuSeparator />
-
                                                 <DropdownMenuGroup>
-                                                    <DropdownMenuItem onSelect={() => { updateStatus(ticket.id, 'in_progress') }} shortcut="⌘p">In Progress</DropdownMenuItem>
+                                                    <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                        onSelect={() => { updateStatus(ticket.id, 'in_progress') }} shortcut="⌘p">In Progress</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem onSelect={() => { updateStatus(ticket.id, 'resolved') }} shortcut="⌘r">Resolved</DropdownMenuItem>
+                                                    <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                        onSelect={() => { updateStatus(ticket.id, 'resolved') }} shortcut="⌘r">Resolved</DropdownMenuItem>
                                                 </DropdownMenuGroup>
-
                                                 <DropdownMenuSeparator />
-
-                                                <DropdownMenuItem onSelect={() => { updateStatus(ticket.id, 'closed') }} shortcut="⇧⌘c">Closed</DropdownMenuItem>
+                                                <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                    onSelect={() => { updateStatus(ticket.id, 'closed') }} shortcut="⇧⌘c">Closed</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
-
                                 </Card>
                             </div>
                         </Draggable>
                     );
                 })}
+            </div>
+            <div className="fixed bottom-8 right-8">
+                <button
+                    onClick={async () => await supabase.auth.signOut()}
+                    className="px-4 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 transition"
+                >
+                    Log Out
+                </button>
             </div>
         </div>
     );
