@@ -16,15 +16,16 @@ import {
     DropdownMenuTrigger,
 } from '../ui/Dropdown';
 
-const getStatusColor = (status: string) => {
+const getStatusVariant = (status: string): BadgeProps["variant"] => {
     switch (status) {
-        case "open": return "red";
-        case "in_progress": return "yellow";
-        case "resolved": return "emerald";
-        case "closed": return "gray";
-        default: return "gray";
+        case "open": return "error";
+        case "in_progress": return "warning";
+        case "resolved": return "success";
+        case "closed": return "neutral";
+        default: return "default";
     }
 };
+
 
 export type Ticket = {
     id: number;
@@ -63,6 +64,7 @@ export default function SupportPage() {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'user-email': email as string,
                 },
                 body: JSON.stringify({ id: ticketId, status: newStatus }),
             }).then(async response => {
@@ -139,7 +141,7 @@ export default function SupportPage() {
                                     <div className="space-y-2 text-sm text-gray-700">
                                         <p>
                                             <span className="font-semibold text-gray-800">Status:</span>
-                                            <Badge color={getStatusColor(ticket.status)} className="ml-2">{ticket.status}</Badge>
+                                            <Badge variant={getStatusVariant(ticket.status)}>{ticket.status}</Badge>
                                         </p>
                                         <p>
                                             <span className="font-semibold text-gray-800">Submitted:</span>

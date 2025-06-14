@@ -2,6 +2,10 @@ import { db } from "@/db/index";
 import { tickets } from "@/db/drizzle/schema";
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
+import StatusUpdateEmail from '@/app/ui/StatusUpdateEmail';
+import { Resend } from 'resend';
+import { render } from '@react-email/render'
+
 export async function GET(request: Request) {
     const allTickets = await db.select().from(tickets);
     if (allTickets.length === 0) {
@@ -60,6 +64,22 @@ export async function PATCH(request: Request) {
     const status = body.status;
     try {
         await db.update(tickets).set({ status: status }).where(eq(tickets.id, id));
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const [ticket] = await db.select().from(tickets).where(eq(tickets.id, body.id))
+
+        const emailHtml = await render(StatusUpdateEmail({
+            customerName: `${ticket.firstName} ${ticket.lastName}`,
+            ticketTitle: ticket.title,
+            newStatus: ticket.status,
+            supportEmail: request.headers.get('user-email') ?? 'support@yourapp.com'
+        }));
+
+        await resend.emails.send({
+            from: 'Support Team <support@yourdomain.com>',
+            to: ticket.email,
+            subject: 'Your Ticket Status Has Been Updated',
+            html: emailHtml
+        })
         return new Response('Ticket updated successfully', {
             status: 200,
         });
