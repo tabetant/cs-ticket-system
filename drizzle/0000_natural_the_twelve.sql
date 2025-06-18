@@ -7,10 +7,10 @@ CREATE TABLE "tickets" (
 	"last_name" text NOT NULL,
 	"email" text NOT NULL,
 	"phone" text NOT NULL,
-	"created_at" date DEFAULT now() NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
 	"tenant" text NOT NULL,
 	"attachment_url" text DEFAULT '' NOT NULL,
 	"status" "status" DEFAULT 'open' NOT NULL,
-	"updated_at" date DEFAULT now() NOT NULL,
-	CONSTRAINT "tickets_email_unique" UNIQUE("email")
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"logs" text DEFAULT '' NOT NULL
 );
