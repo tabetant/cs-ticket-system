@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import Draggable from 'react-draggable';
-
+import {
+    Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger
+} from '../ui/Popover';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -40,6 +42,7 @@ export type Ticket = {
     attachment_url: string;
     status: 'open' | 'closed' | 'in_progress' | 'resolved';
     updatedAt: string;
+    logs: string;
 };
 
 export default function SupportPage() {
@@ -68,7 +71,7 @@ export default function SupportPage() {
                     'Content-Type': 'application/json',
                     'user-email': email as string,
                 },
-                body: JSON.stringify({ id: ticketId, status: newStatus }),
+                body: JSON.stringify({ id: ticketId, status: newStatus, log: `Status changed to ${newStatus} by ${email} on ${new Date()}` }),
             }).then(async response => {
                 if (!response.ok) {
                     throw new Error(`Error updating ticket status: ${response.statusText}`);
@@ -181,6 +184,18 @@ export default function SupportPage() {
                                                     onSelect={() => { updateStatus(ticket.id, 'closed') }} shortcut="⇧⌘c">Closed</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
+                                    </div>
+                                    <div>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button className="mt-4 bg-gray-200 text-gray-800 px-4 py-1 rounded-md hover:bg-gray-300 transition">
+                                                    View Logs
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80 p-4">
+                                                <p>{ticket.logs}</p>
+                                            </PopoverContent>
+                                        </Popover>
                                     </div>
                                 </Card>
                             </div>

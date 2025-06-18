@@ -71,15 +71,37 @@ export async function PATCH(request: Request) {
 
     const id = body.id;
     const status = body.status;
-
+    const log = body.log;
     try {
         // Step 1: Update status
-        const updateResult = await db.update(tickets).set({ status }).where(eq(tickets.id, id));
+        const updateResult = await db.update(tickets).set({ status, log:  }).where(eq(tickets.id, id));
         console.log("[PATCH] Ticket status updated in DB:", updateResult);
 
         // Step 2: Fetch the updated ticket
         const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
         console.log("[PATCH] Fetched updated ticket:", ticket);
+        // Step 1: Parse existing log string to an array
+        let currentLog: any[] = [];
+        try {
+            currentLog = ticket.logs ? JSON.parse(ticket.logs) : [];
+        } catch (err) {
+            console.error("Failed to parse log string:", err);
+        }
+
+        // Step 2: Add new entry
+        const newEntry = {
+            timestamp: new Date().toISOString(),
+            message: `Status changed to ${body.status}`,
+            user: request.headers.get('user-email') ?? 'unknown',
+        };
+
+        // Step 3: Convert back to JSON string
+        const updatedLog = JSON.stringify([...currentLog, newEntry]);
+
+        // Step 4: Update DB
+        await db.update(tickets)
+            .set({ status: body.status, logs: updatedLog })
+            .where(eq(tickets.id, body.id));
 
         if (!ticket || !ticket.email) {
             console.warn("[PATCH] Ticket or email not found.");
