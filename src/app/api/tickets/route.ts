@@ -74,7 +74,7 @@ export async function PATCH(request: Request) {
     const log = body.log;
     try {
         // Step 1: Update status
-        const updateResult = await db.update(tickets).set({ status, log:  }).where(eq(tickets.id, id));
+        const updateResult = await db.update(tickets).set({ status }).where(eq(tickets.id, id));
         console.log("[PATCH] Ticket status updated in DB:", updateResult);
 
         // Step 2: Fetch the updated ticket

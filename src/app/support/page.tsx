@@ -124,6 +124,9 @@ export default function SupportPage() {
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tickets.map((ticket) => {
+                    const logEntries = typeof ticket.logs === 'string'
+                        ? JSON.parse(ticket.logs)
+                        : ticket.logs || [];
 
                     return (
                         <Draggable
@@ -193,7 +196,22 @@ export default function SupportPage() {
                                                 </button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-80 p-4">
-                                                <p>{ticket.logs}</p>
+                                                {logEntries.length > 0 ? (
+                                                    <ul className="space-y-3">
+                                                        {logEntries.map((entry: any, index: number) => (
+                                                            <li key={index} className="border-b last:border-none pb-2">
+                                                                <p className="text-gray-800">
+                                                                    <span className="font-medium text-blue-700">{entry.user}</span>{" "}
+                                                                    <span>changed status to</span>{" "}
+                                                                    <span className="font-semibold text-green-600">{entry.message.split("to")[1].trim()}</span>
+                                                                </p>
+                                                                <p className="text-xs text-gray-500">{new Date(entry.timestamp).toLocaleString()}</p>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="italic text-gray-500">No history yet.</p>
+                                                )}
                                             </PopoverContent>
                                         </Popover>
                                     </div>
