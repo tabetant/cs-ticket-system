@@ -62,33 +62,56 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
     const body = await request.json();
+    console.log("[PATCH] Received body:", body);
+
     if (!body.id || !body.status) {
+        console.warn("[PATCH] Missing required fields");
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    try {
-        await db.update(tickets).set({ status: body.status }).where(eq(tickets.id, body.id));
+    const id = body.id;
+    const status = body.status;
 
-        const [ticket] = await db.select().from(tickets).where(eq(tickets.id, body.id));
-        const resend = new Resend(process.env.RESEND_API_KEY);
+    try {
+        // Step 1: Update status
+        const updateResult = await db.update(tickets).set({ status }).where(eq(tickets.id, id));
+        console.log("[PATCH] Ticket status updated in DB:", updateResult);
+
+        // Step 2: Fetch the updated ticket
+        const [ticket] = await db.select().from(tickets).where(eq(tickets.id, id));
+        console.log("[PATCH] Fetched updated ticket:", ticket);
+
+        if (!ticket || !ticket.email) {
+            console.warn("[PATCH] Ticket or email not found.");
+            return NextResponse.json({ error: "Ticket not found or missing email" }, { status: 404 });
+        }
+
+        // Step 3: Prepare email content
+        const supportEmail = request.headers.get('user-email') ?? 'support@yourapp.com';
+        console.log("[PATCH] Preparing email from:", supportEmail, "to:", ticket.email);
 
         const emailHtml = await render(StatusUpdateEmail({
             customerName: `${ticket.firstName} ${ticket.lastName}`,
             ticketTitle: ticket.title,
             newStatus: ticket.status,
-            supportEmail: request.headers.get('user-email') ?? 'support@yourapp.com'
+            supportEmail,
         }));
+        console.log("[PATCH] Rendered email HTML successfully");
 
-        await resend.emails.send({
-            from: 'Support Team <support@yourdomain.com>',
+        // Step 4: Send email
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const result = await resend.emails.send({
+            from: `Support Team <onboarding@resend.dev>`,
             to: ticket.email,
             subject: 'Your Ticket Status Has Been Updated',
-            html: emailHtml
+            html: emailHtml,
         });
+        console.log("[PATCH] Email sent successfully:", result);
 
-        return NextResponse.json({ message: "Ticket updated and email sent successfully" }, { status: 200 });
+        return NextResponse.json({ message: "Ticket updated and email sent." }, { status: 200 });
+
     } catch (error: any) {
-        console.error("Ticket update failed:", error);
-        return NextResponse.json({ error: error.message || "Error updating ticket" }, { status: 500 });
+        console.error("[PATCH] Ticket update failed:", error);
+        return NextResponse.json({ error: error.message || "Unknown error" }, { status: 500 });
     }
 }

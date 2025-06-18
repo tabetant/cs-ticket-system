@@ -76,7 +76,7 @@ export default function SupportPage() {
                 // ✅ Re-fetch updated tickets after status change
                 const updatedResponse = await fetch(`api/tickets?status=${status}`);
                 const updatedTickets = await updatedResponse.json();
-                setTickets(updatedTickets);
+                setTickets(updatedTickets.tickets);
             });
             ;
         } catch (error) {
