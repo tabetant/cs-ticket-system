@@ -1,9 +1,18 @@
 'use client'
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ticket } from "../support/page";
-
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectGroupLabel,
+    SelectItem,
+    SelectSeparator,
+    SelectTrigger,
+    SelectValue,
+} from "../ui/Select";
 
 export default function TicketSubmissionForm() {
     const inputsSchema = z.object({
@@ -22,6 +31,7 @@ export default function TicketSubmissionForm() {
         handleSubmit,
         formState: { errors },
         reset,
+        control,
     } = useForm<Inputs>({
         resolver: zodResolver(inputsSchema),
         defaultValues: {
@@ -127,14 +137,30 @@ export default function TicketSubmissionForm() {
 
             <div className="space-y-2">
                 <label className="block font-semibold">Tenant:</label>
-                <input
-                    type="text"
-                    placeholder="Tenant name"
-                    {...register("tenant")}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                <Controller
+                    control={control}
+                    name="tenant"
+                    render={({ field }) => (
+                        <Select
+                            {...field}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            className="w-full"
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select Tenant" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="tenant-a">Tenant A</SelectItem>
+                                <SelectItem value="tenant-b">Tenant B</SelectItem>
+                                <SelectItem value="tenant-c">Tenant C</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
                 />
                 {errors.tenant && <p className="text-red-500 text-sm">{errors.tenant.message}</p>}
             </div>
+
 
             <button
                 type="submit"

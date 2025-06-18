@@ -16,7 +16,6 @@ import {
     DropdownMenuTrigger,
 } from '../ui/Dropdown';
 
-
 const getStatusVariant = (status: string): BadgeProps["variant"] => {
     switch (status) {
         case "open": return "error";
