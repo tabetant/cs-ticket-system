@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo, createRef } from 'react';
+import { useState, useEffect, useMemo, createRef, useRef } from 'react';
 import { supabase } from '@/db/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '../ui/Card';
@@ -60,9 +60,10 @@ export default function SupportPage() {
         return refs;
     }, [tickets]);
 
+
     async function updateStatus(ticketId: number, newStatus: string) {
         try {
-            fetch('api/tickets/', {
+            fetch(`api/tickets?status=${status}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ export default function SupportPage() {
                     throw new Error(`Error updating ticket status: ${response.statusText}`);
                 }
                 // ✅ Re-fetch updated tickets after status change
-                const updatedResponse = await fetch('/api/tickets');
+                const updatedResponse = await fetch(`api/tickets?status=${status}`);
                 const updatedTickets = await updatedResponse.json();
                 setTickets(updatedTickets);
             });
@@ -120,11 +121,12 @@ export default function SupportPage() {
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tickets.map((ticket) => {
+
                     return (
                         <Draggable
                             key={ticket.id}
-                            nodeRef={nodeRefs[ticket.id] as React.RefObject<HTMLDivElement>}
                             handle=".handle"
+                            nodeRef={nodeRefs[ticket.id]}
                         >
                             <div ref={nodeRefs[ticket.id]}>
                                 <Card className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-all duration-300">
