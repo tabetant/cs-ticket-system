@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import StatusUpdateEmail from '@/app/ui/StatusUpdateEmail';
 import { Resend } from 'resend';
-import { render } from '@react-email/render'
+import { render } from '@react-email/render';
 
 export async function GET(request: Request) {
     const url = new URL(request.url);
@@ -13,63 +13,64 @@ export async function GET(request: Request) {
     const allowedStatuses = ['open', 'closed', 'in_progress', 'resolved'] as const;
     type Status = typeof allowedStatuses[number];
 
-    const results = status && status !== 'all' && allowedStatuses.includes(status as Status)
-        ? await db.select().from(tickets).where(eq(tickets.status, status as Status))
-        : await db.select().from(tickets);
+    try {
+        const results = status && status !== 'all' && allowedStatuses.includes(status as Status)
+            ? await db.select().from(tickets).where(eq(tickets.status, status as Status))
+            : await db.select().from(tickets);
 
-    return NextResponse.json(results);
+        return NextResponse.json({ tickets: results }, { status: 200 });
+    } catch (error) {
+        console.error("Error fetching tickets:", error);
+        return NextResponse.json({ error: "Failed to fetch tickets" }, { status: 500 });
+    }
 }
 
 export async function POST(request: Request) {
     const body = await request.json();
-    if (!body.title || !body.description || !body.firstName || !body.email || !body.phone || !body.tenant) {
-        return new NextResponse("Missing required fields", { status: 400 });
+    const requiredFields = ['title', 'description', 'firstName', 'lastName', 'email', 'phone', 'tenant'];
+    const missing = requiredFields.filter(field => !body[field]);
+
+    if (missing.length > 0) {
+        return NextResponse.json({ error: `Missing required fields: ${missing.join(', ')}` }, { status: 400 });
     }
-    if (typeof body.title !== 'string' || typeof body.description !== 'string' ||
-        typeof body.firstName !== 'string' || typeof body.lastName !== 'string' ||
-        typeof body.email !== 'string' || typeof body.phone !== 'string' ||
-        typeof body.tenant !== 'string' || typeof body.status !== 'string') {
-        return new NextResponse("Invalid data types", { status: 400 });
+
+    if (!['open', 'closed', 'in_progress', 'resolved'].includes(body.status)) {
+        return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
     }
-    if (body.status && !['open', 'closed', 'in_progress', 'resolved'].includes(body.status)) {
-        return new NextResponse("Invalid status value", { status: 400 });
-    }
+
     try {
-        await db.insert(tickets).values({
+        const result = await db.insert(tickets).values({
             title: body.title,
             description: body.description,
-            firstName: body.firstName || '',
-            lastName: body.lastName || '',
-            email: body.email || '',
-            phone: body.phone || '',
-            tenant: body.tenant || '',
-            attachment_url: body.attachment_url || '',
-            status: body.status || 'open',
+            firstName: body.firstName,
+            lastName: body.lastName,
+            email: body.email,
+            phone: body.phone,
+            tenant: body.tenant,
+            attachment_url: body.attachment_url ?? '',
+            status: body.status ?? 'open',
             updatedAt: new Date(),
             createdAt: new Date(),
         });
 
-        return new Response('Ticket added successfully', {
-            status: 201,
-        });
+        return NextResponse.json({ message: "Ticket added successfully" }, { status: 201 });
     } catch (error: any) {
         console.error("Ticket insert failed:", error);
-
-        return new Response("Error creating ticket: " + (error?.message || error), { status: 500 });
+        return NextResponse.json({ error: error.message || "Error creating ticket" }, { status: 500 });
     }
 }
 
 export async function PATCH(request: Request) {
     const body = await request.json();
     if (!body.id || !body.status) {
-        return new NextResponse("Missing required fields", { status: 400 });
+        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-    const id = body.id;
-    const status = body.status;
+
     try {
-        await db.update(tickets).set({ status: status }).where(eq(tickets.id, id));
+        await db.update(tickets).set({ status: body.status }).where(eq(tickets.id, body.id));
+
+        const [ticket] = await db.select().from(tickets).where(eq(tickets.id, body.id));
         const resend = new Resend(process.env.RESEND_API_KEY);
-        const [ticket] = await db.select().from(tickets).where(eq(tickets.id, body.id))
 
         const emailHtml = await render(StatusUpdateEmail({
             customerName: `${ticket.firstName} ${ticket.lastName}`,
@@ -83,12 +84,11 @@ export async function PATCH(request: Request) {
             to: ticket.email,
             subject: 'Your Ticket Status Has Been Updated',
             html: emailHtml
-        })
-        return new Response('Ticket updated successfully', {
-            status: 200,
         });
+
+        return NextResponse.json({ message: "Ticket updated and email sent successfully" }, { status: 200 });
     } catch (error: any) {
         console.error("Ticket update failed:", error);
-        return new Response("Error updating ticket: " + (error?.message || error), { status: 500 });
+        return NextResponse.json({ error: error.message || "Error updating ticket" }, { status: 500 });
     }
 }
