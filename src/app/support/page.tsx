@@ -124,10 +124,16 @@ export default function SupportPage() {
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tickets.map((ticket) => {
-                    const logEntries = typeof ticket.logs === 'string'
-                        ? JSON.parse(ticket.logs)
-                        : ticket.logs || [];
+                    let logEntries = [];
 
+                    try {
+                        logEntries = typeof ticket.logs === 'string'
+                            ? JSON.parse(ticket.logs || '[]')
+                            : ticket.logs || [];
+                    } catch (e) {
+                        console.error("Failed to parse logs:", ticket.logs, e);
+                        logEntries = [];
+                    }
                     return (
                         <Draggable
                             key={ticket.id}
