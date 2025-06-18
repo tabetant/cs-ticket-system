@@ -92,7 +92,8 @@ export default function SupportPage() {
                 return;
             }
             const ticketsData = await response.json();
-            setTickets(ticketsData);
+
+            setTickets(ticketsData.tickets);
         } catch (error) {
             console.error('Fetch failed:', error);
         } finally {
