@@ -167,59 +167,68 @@ export default function SupportPage() {
                                             <span className="ml-6 text-gray-500">{ticket.email} — {ticket.phone}</span>
                                         </p>
                                     </div>
-
-                                    <div className="mt-4">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <button className="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700 transition">Edit Status</button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="w-48">
-                                                <DropdownMenuLabel>Status</DropdownMenuLabel>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuGroup>
-                                                    <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
-                                                        onSelect={() => { updateStatus(ticket.id, 'open') }} shortcut="⌘o">Open</DropdownMenuItem>
-                                                </DropdownMenuGroup>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuGroup>
-                                                    <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
-                                                        onSelect={() => { updateStatus(ticket.id, 'in_progress') }} shortcut="⌘p">In Progress</DropdownMenuItem>
+                                    <div className="flex justify-between items-end mt-4">
+                                        {/* Left buttons: Dropdown and Popover stacked */}
+                                        <div className="flex flex-col gap-2">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <button className="bg-blue-600 text-white px-4 py-1 rounded-md hover:bg-blue-700 transition">Edit Status</button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent className="w-48">
+                                                    <DropdownMenuLabel>Status</DropdownMenuLabel>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuGroup>
+                                                        <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                            onSelect={() => { updateStatus(ticket.id, 'open') }} shortcut="⌘o">Open</DropdownMenuItem>
+                                                    </DropdownMenuGroup>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuGroup>
+                                                        <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                            onSelect={() => { updateStatus(ticket.id, 'in_progress') }} shortcut="⌘p">In Progress</DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
+                                                            onSelect={() => { updateStatus(ticket.id, 'resolved') }} shortcut="⌘r">Resolved</DropdownMenuItem>
+                                                    </DropdownMenuGroup>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
-                                                        onSelect={() => { updateStatus(ticket.id, 'resolved') }} shortcut="⌘r">Resolved</DropdownMenuItem>
-                                                </DropdownMenuGroup>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-gray-700 cursor-pointer transition-colors"
-                                                    onSelect={() => { updateStatus(ticket.id, 'closed') }} shortcut="⇧⌘c">Closed</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                    <div>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <button className="mt-4 bg-gray-200 text-gray-800 px-4 py-1 rounded-md hover:bg-gray-300 transition">
-                                                    View Logs
-                                                </button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80 p-4">
-                                                {logEntries.length > 0 ? (
-                                                    <ul className="space-y-3">
-                                                        {logEntries.map((entry: any, index: number) => (
-                                                            <li key={index} className="border-b last:border-none pb-2">
-                                                                <p className="text-gray-800">
-                                                                    <span className="font-medium text-blue-700">{entry.user}</span>{" "}
-                                                                    <span>changed status to</span>{" "}
-                                                                    <span className="font-semibold text-green-600">{entry.message.split("to")[1].trim()}</span>
-                                                                </p>
-                                                                <p className="text-xs text-gray-500">{new Date(entry.timestamp).toLocaleString()}</p>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                ) : (
-                                                    <p className="italic text-gray-500">No history yet.</p>
-                                                )}
-                                            </PopoverContent>
-                                        </Popover>
+                                                        onSelect={() => { updateStatus(ticket.id, 'closed') }} shortcut="⇧⌘c">Closed</DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-md hover:bg-gray-300 transition">
+                                                        View Logs
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-80 p-4">
+                                                    {logEntries.length > 0 ? (
+                                                        <ul className="space-y-3">
+                                                            {logEntries.map((entry: any, index: number) => (
+                                                                <li key={index} className="border-b last:border-none pb-2">
+                                                                    <p className="text-gray-800">
+                                                                        <span className="font-medium text-blue-700">{entry.user}</span>{" "}
+                                                                        <span>changed status to</span>{" "}
+                                                                        <span className="font-semibold text-green-600">{entry.message.split("to")[1].trim()}</span>
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-500">{new Date(entry.timestamp).toLocaleString()}</p>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <p className="italic text-gray-500">No history yet.</p>
+                                                    )}
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
+
+                                        {/* Right button: Delete */}
+                                        <button
+                                            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition text-sm"
+                                        >
+                                            <span>🗑️</span>
+                                            <span>Delete</span>
+                                        </button>
                                     </div>
                                 </Card>
                             </div>
