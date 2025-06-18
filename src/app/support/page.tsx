@@ -1,11 +1,11 @@
 'use client';
 import { useState, useEffect, useMemo, createRef } from 'react';
 import { supabase } from '@/db/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import Draggable from 'react-draggable';
-import { useTicketFilter } from '../ui/TicketFilterContext';
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -15,6 +15,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/Dropdown';
+
 
 const getStatusVariant = (status: string): BadgeProps["variant"] => {
     switch (status) {
@@ -43,7 +44,8 @@ export type Ticket = {
 };
 
 export default function SupportPage() {
-    const { filter } = useTicketFilter();
+    const searchParams = useSearchParams();
+    const status = searchParams.get('status') ?? 'all';
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -82,7 +84,21 @@ export default function SupportPage() {
             setError('Failed to update ticket status. Please try again later.');
         }
     }
-
+    const fetchTickets = async () => {
+        try {
+            const response = await fetch(`api/tickets?status=${status}`);
+            if (!response.ok) {
+                console.error(`Error fetching tickets: ${response.statusText}`);
+                return;
+            }
+            const ticketsData = await response.json();
+            setTickets(ticketsData);
+        } catch (error) {
+            console.error('Fetch failed:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const checkLoggedin = async () => {
@@ -96,34 +112,14 @@ export default function SupportPage() {
             }
         };
 
-        const fetchTickets = async () => {
-            try {
-                const response = await fetch('/api/tickets');
-                if (!response.ok) {
-                    console.error(`Error fetching tickets: ${response.statusText}`);
-                    return;
-                }
-                const ticketsData = await response.json();
-                setTickets(ticketsData);
-            } catch (error) {
-                console.error('Fetch failed:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         checkLoggedin();
         fetchTickets();
-    }, []);
-
-    const filteredTickets = filter === 'all'
-        ? tickets
-        : tickets.filter(ticket => ticket.status === filter);
+    }, [status, router]);
 
     return (
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredTickets.map((ticket) => {
+                {tickets.map((ticket) => {
                     return (
                         <Draggable
                             key={ticket.id}

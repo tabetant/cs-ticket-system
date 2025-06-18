@@ -7,13 +7,17 @@ import { Resend } from 'resend';
 import { render } from '@react-email/render'
 
 export async function GET(request: Request) {
-    const allTickets = await db.select().from(tickets);
-    if (allTickets.length === 0) {
-        return new NextResponse("No tickets found", { status: 404 });
-    }
-    return NextResponse.json(allTickets, {
-        status: 200,
-    });
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status');
+
+    const allowedStatuses = ['open', 'closed', 'in_progress', 'resolved'] as const;
+    type Status = typeof allowedStatuses[number];
+
+    const results = status && status !== 'all' && allowedStatuses.includes(status as Status)
+        ? await db.select().from(tickets).where(eq(tickets.status, status as Status))
+        : await db.select().from(tickets);
+
+    return NextResponse.json(results);
 }
 
 export async function POST(request: Request) {
