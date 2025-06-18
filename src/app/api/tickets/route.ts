@@ -137,3 +137,25 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: error.message || "Unknown error" }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const body = await request.json();
+        const id = body.id;
+
+        if (!id) {
+            return NextResponse.json({ error: "Missing ticket id" }, { status: 400 });
+        }
+
+        const result = await db.delete(tickets).where(eq(tickets.id, id));
+
+        if (result.length === 0) {
+            return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: "Ticket deleted successfully" }, { status: 200 });
+    } catch (error: any) {
+        console.error("Error deleting ticket:", error);
+        return NextResponse.json({ error: error.message || "Error deleting ticket" }, { status: 500 });
+    }
+}

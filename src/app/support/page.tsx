@@ -120,6 +120,26 @@ export default function SupportPage() {
         fetchTickets();
     }, [status, router]);
 
+    async function handleDelete(id: number) {
+        try {
+            const response = await fetch(`api/tickets?status=${status}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: id }),
+            });
+            if (!response.ok) {
+                throw new Error(`Error deleting ticket: ${response.statusText}`);
+            }
+            // Optionally re-fetch tickets after deletion
+            fetchTickets();
+        } catch (error) {
+            console.error('Failed to delete ticket:', error);
+            setError('Failed to delete ticket. Please try again later.');
+        }
+        fetchTickets();
+    }
     return (
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -224,7 +244,7 @@ export default function SupportPage() {
 
                                         {/* Right button: Delete */}
                                         <button
-                                            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition text-sm"
+                                            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition text-sm" onClick={() => handleDelete(ticket.id)}
                                         >
                                             <span>🗑️</span>
                                             <span>Delete</span>
