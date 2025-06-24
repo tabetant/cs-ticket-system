@@ -62,31 +62,6 @@ export default function SupportPage() {
         return refs;
     }, [tickets]);
 
-
-    async function updateStatus(ticketId: number, newStatus: string) {
-        try {
-            fetch(`api/tickets?status=${status}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'user-email': email as string,
-                },
-                body: JSON.stringify({ id: ticketId, status: newStatus, log: `Status changed to ${newStatus} by ${email} on ${new Date()}` }),
-            }).then(async response => {
-                if (!response.ok) {
-                    throw new Error(`Error updating ticket status: ${response.statusText}`);
-                }
-                // ✅ Re-fetch updated tickets after status change
-                const updatedResponse = await fetch(`api/tickets?status=${status}`);
-                const updatedTickets = await updatedResponse.json();
-                setTickets(updatedTickets.tickets);
-            });
-            ;
-        } catch (error) {
-            console.error('Failed to update ticket status:', error);
-            setError('Failed to update ticket status. Please try again later.');
-        }
-    }
     const fetchTickets = async () => {
         try {
             const response = await fetch(`api/tickets?status=${status}`);
@@ -103,6 +78,29 @@ export default function SupportPage() {
             setLoading(false);
         }
     };
+
+    async function updateStatus(ticketId: number, newStatus: string) {
+        try {
+            fetch(`api/tickets?status=${status}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'user-email': email as string,
+                },
+                body: JSON.stringify({ id: ticketId, status: newStatus, log: `Status changed to ${newStatus} by ${email} on ${new Date()}` }),
+            }).then(async response => {
+                if (!response.ok) {
+                    fetchTickets();
+                    throw new Error(`Error updating ticket status: ${response.statusText}`);
+                }
+            });
+            ;
+        } catch (error) {
+            console.error('Failed to update ticket status:', error);
+            setError('Failed to update ticket status. Please try again later.');
+        }
+    }
+
 
     useEffect(() => {
         const checkLoggedin = async () => {
@@ -141,7 +139,6 @@ export default function SupportPage() {
         fetchTickets();
     }
 
-
     const statuses = ["open", "in_progress", "resolved", "closed"];
 
     interface DropEvent extends React.DragEvent<HTMLDivElement> { }
@@ -151,21 +148,30 @@ export default function SupportPage() {
     }
 
     const handleDrop: HandleDrop = (e, newStatus) => {
+        console.log(tickets);
         e.preventDefault();
         const ticketId = parseInt(e.dataTransfer.getData("ticketId"));
+        const newTicket = tickets.find(ticket => ticket.id == ticketId);
+        if (!newTicket) {
+            return;
+        }
+        newTicket.status = newStatus;
+        setTickets(prev => [...prev.filter(ticket => ticket.id != ticketId), newTicket]);
+        console.log(ticketId);
+        console.log(newStatus);
         updateStatus(ticketId, newStatus);
     };
 
     return (
         <div className="flex-1 bg-gray-100 p-6 min-h-screen overflow-auto">
             {status === "all" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 grid-rows-2 gap-4 h-[calc(100vh-5rem)]">
                     {statuses.map((statusItem) => (
                         <div
                             key={statusItem}
                             onDrop={(e) => handleDrop(e, statusItem as Ticket['status'])}
                             onDragOver={(e) => e.preventDefault()}
-                            className="bg-white rounded-lg shadow p-4 min-h-[300px] flex flex-col gap-4"
+                            className="bg-white rounded-lg shadow p-4 flex flex-col gap-4 overflow-auto"
                         >
                             <h2 className="text-lg font-bold capitalize border-b pb-2 mb-2 text-blue-800">{statusItem.replace("_", " ")}</h2>
                             {tickets.filter(ticket => ticket.status === statusItem).map((ticket) => {
@@ -252,7 +258,8 @@ export default function SupportPage() {
                     ))}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 grid-rows-2 gap-6 h-[calc(100vh-5rem)]">
+
                     {tickets.map((ticket) => {
                         let logEntries: any[] = [];
                         try {
@@ -363,6 +370,5 @@ export default function SupportPage() {
             </div>
         </div>
     );
-
 }
 
