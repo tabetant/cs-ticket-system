@@ -1,4 +1,5 @@
 📬 CS Ticket System
+
 A full-stack support ticket management system for internal use by property management teams. Designed to simplify support workflows, track tenant requests, and optimize resolution times — all through a clean, responsive interface.
 
 🛠 Tech Stack
