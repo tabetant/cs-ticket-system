@@ -16,6 +16,7 @@ resend + react-email (email notifications)
 Submit support requests (title, description, contact info, status)
 Attach optional images/screenshots
 Real-time validation + mobile-friendly
+
 🔐 Support Dashboard (/support)
 Login-only access (via Supabase Auth)
 Filter tickets by status: Open, In Progress, Resolved, Closed
@@ -23,6 +24,7 @@ Drag & drop tickets between statuses
 View ticket logs with Popover history
 Delete tickets with confirmation
 Email notifications to tenants on status change
+
 📦 Ticket Statuses
 Open 🟢
 In Progress 🛠️
