@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+📬 CS Ticket System
+A full-stack support ticket management system for internal use by property management teams. Designed to simplify support workflows, track tenant requests, and optimize resolution times — all through a clean, responsive interface.
 
-## Getting Started
+🛠 Tech Stack
+Frontend: React, TypeScript, Tailwind CSS, Tremor UI
+Backend: Next.js API Routes, Supabase (PostgreSQL + Auth)
+State Management: React Hooks, SWR
+Other Libraries:
+react-hook-form + zod (form validation)
+react-phone-input-2 (phone input)
+react-draggable (drag & drop ticket status)
+resend + react-email (email notifications)
 
-First, run the development server:
+✨ Features
+👤 Tenant-Facing Page (/)
+Submit support requests (title, description, contact info, status)
+Attach optional images/screenshots
+Real-time validation + mobile-friendly
+🔐 Support Dashboard (/support)
+Login-only access (via Supabase Auth)
+Filter tickets by status: Open, In Progress, Resolved, Closed
+Drag & drop tickets between statuses
+View ticket logs with Popover history
+Delete tickets with confirmation
+Email notifications to tenants on status change
+📦 Ticket Statuses
+Open 🟢
+In Progress 🛠️
+Resolved ✅
+Closed 🗃️
 
-```bash
+💻 System Architecture
+Client ↔ Next.js API Routes ↔ Supabase (Postgres + Auth)
+                           ↘ Email Service (resend)
+Authentication is handled via Supabase
+Support team is whitelisted manually
+API routes are protected on the backend
+Ticket logs are saved and displayed as status history
+Status changes trigger email notifications via resend
+
+🚀 Getting Started
+git clone https://github.com/yourusername/cs-ticket-system
+cd cs-ticket-system
+npm install
+
+Set up environment variables:
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+RESEND_API_KEY=...
+
+Run locally:
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🧠 Key Design Decisions
+Drag & Drop Status Management: Implemented only when status=all for clarity and simplicity.
+Client-Side Form Validation: Built with react-hook-form + zod for speed and DX.
+Logs System: Automatically captures user, timestamp, and status transitions.
+Responsiveness: Built mobile-first using Tailwind and Tremor UI components.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🧪 To-Do / Future Improvements
+Add file upload preview before submission
+Admin role management with RBAC
+Analytics dashboard (ticket trends)
+Optional live chat integration
